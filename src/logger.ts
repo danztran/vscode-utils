@@ -1,12 +1,20 @@
-import * as vscode from "vscode";
-import { OutputChannel, ExtensionContext } from "vscode";
+import { OutputChannel } from "vscode";
 
 const DEBUG = 1;
 const INFO = 2;
 const WARN = 3;
 const ERROR = 4;
 
+const mapLevel: Record<number, string> = {
+  1: "debug",
+  2: "info",
+  3: "warn",
+  4: "error",
+};
+
 export type VoidFunc = (...args: unknown[]) => void;
+
+export type LogLevel = "info" | "debug" | "warn" | "error";
 
 export interface Logger {
   info: VoidFunc;
@@ -16,21 +24,25 @@ export interface Logger {
 export interface LoggerProps {
   name?: string;
   channel: OutputChannel;
-  level?: "info" | "debug";
+  logLevel?: LogLevel;
 }
 
 export class DefaultLogger implements Logger {
   private name: string;
   private channel: OutputChannel;
-  private level: number;
+  private level: number = 1;
 
-  constructor({ name = "[logger]", level = "debug", channel }: LoggerProps) {
+  constructor({ name = "default", logLevel = "debug", channel }: LoggerProps) {
     this.name = name;
     this.debug = this.debug.bind(this);
     this.info = this.info.bind(this);
     this.warn = this.warn.bind(this);
     this.error = this.error.bind(this);
     this.channel = channel;
+    this.setLevel(logLevel);
+  }
+
+  setLevel(level: LogLevel): void {
     this.level = this.parseLevel(level);
   }
 
@@ -50,7 +62,7 @@ export class DefaultLogger implements Logger {
     this.log(ERROR, ...args);
   }
 
-  log(level: number, ...args: unknown[]): void {
+  private log(level: number, ...args: unknown[]): void {
     args = args.map(e => {
       if (typeof e === "object") {
         return JSON.stringify(e);
@@ -58,11 +70,26 @@ export class DefaultLogger implements Logger {
       return e;
     });
     if (level >= this.level) {
-      this.channel.appendLine(`${this.name} ${args.join(" ")}`);
+      const time = this.getCurrentTime();
+      const logLevel = mapLevel[level] || "";
+      this.channel.appendLine(
+        `${time}\t${logLevel}\t${this.name}\t\t${args.join(" ")}`,
+      );
     }
   }
 
-  parseLevel(level = "debug"): number {
+  private getCurrentTime(): string {
+    const d = new Date();
+    const format = (n: number) => n.toString().padStart(2, "0");
+    const hr = format(d.getHours());
+    const min = format(d.getMinutes());
+    const sec = format(d.getSeconds());
+    const msec = d.getMilliseconds().toString().padEnd(3, "0");
+    const s = `${hr}:${min}:${sec}.${msec}`;
+    return s;
+  }
+
+  private parseLevel(level = "debug"): number {
     switch (level.toLowerCase()) {
       case "error":
         return 4;

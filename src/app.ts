@@ -7,7 +7,7 @@ export class App extends DefaultLogger {
   constructor(ctx: ExtensionContext) {
     const channel = vscode.window.createOutputChannel("Utils");
     super({
-      level: "debug",
+      logLevel: "debug",
       channel,
     });
     this.ctx = ctx;
