@@ -27,17 +27,17 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "yarn esbuild-base -- --minify",
-    "vscode:install": "yarn compile && yarn vsce package -o out.vsix && code --install-extension out.vsix",
+    "vscode:prepublish": "pnpm esbuild-base --minify",
+    "vscode:install": "pnpm compile && pnpm vsce package -o out.vsix && code --install-extension out.vsix",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "yarn run compile && yarn run lint",
+    "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
     "test-compile": "tsc -p ./",
     "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
-    "esbuild": "yarn esbuild-base -- --sourcemap",
-    "esbuild-watch": "yarn esbuild-base -- --sourcemap --watch"
+    "esbuild": "pnpm esbuild-base --sourcemap",
+    "esbuild-watch": "pnpm esbuild-base --sourcemap --watch"
   },
   "devDependencies": {
     "@types/glob": "^7.1.4",
@@ -54,5 +54,6 @@
     "typescript": "^4.4.3",
     "vsce": "^1.100.1"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "packageManager": "pnpm@8.12.1+sha1.aa961ffce9b6eaa56307d9b5ff7e984f25b7eb58"
 }
