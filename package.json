@@ -30,7 +30,7 @@
   },
   "scripts": {
     "vscode:prepublish": "pnpm run package",
-    "vscode:install": "pnpm vscode:prepublish && code --install-extension out.vsix",
+    "vscode:install": "pnpm vscode:prepublish && pnpm vsce package -o out.vsix --no-dependencies && code --install-extension out.vsix",
     "compile": "pnpm run check-types && pnpm run lint && node esbuild.js",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
